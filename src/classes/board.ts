@@ -9,9 +9,23 @@ class Board {
         this.size = this.tiles.length
     }
 
-    // string representation of this board
+    // board representation of this board
     toStrings(): string {
-        return this.tiles.flat().join('');
+        return this.tiles.map(row => row.join(' ')).join('\n');
+    }
+
+    inversionCount() {
+        let count = 0;
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                for (let k = j + 1; k < this.size; k++) {
+                    if (this.tiles[i][j] !== 0 && this.tiles[i][k] !== 0 && this.tiles[i][j] > this.tiles[i][k]) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
     }
     
     // board dimension n

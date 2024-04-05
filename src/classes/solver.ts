@@ -14,30 +14,37 @@ class Solver {
 
     // is the initial board solvable? (see below)
     isSolvable(): boolean {
-        // PLS MODIFY
-        return true
+        // Calculate the sum of the Manhattan distances for the initial board
+        const manhattanDistanceSum = this.initial.manhattan();
         
+        // If the sum of the Manhattan distances is even, the puzzle is solvable
+        // Otherwise, it's unsolvable
+        return manhattanDistanceSum % 2 === 0;
     }
 
-    //implement tracking previous boards while solving for solution.
     //implement isSolvable criteria, and moves method
 
     // min number of moves to solve initial board; -1 if unsolvable
     moves(): number {
-        // PLS MODIFY
-        return 0;
+        const solution = this.solution();
+        if (solution.length > 0) {
+            return solution.length - 1;
+        } else {
+            return -1;
+        }
     }
-
+    
     // sequence of boards in a shortest solution; null if unsolvable
     solution(): Board[] {
-        const priorityQueue = new MinHeap<SearchNode>([], {comparator: (a, b) => a.priority() - b.priority()});
+        const priorityQueue = new MinHeap<SearchNode>([], {
+            comparator: (a, b) => 
+            a.manhattanPriority() - b.manhattanPriority()});
         const initialSearchNode = new SearchNode(0, null, this.initial);
         priorityQueue.add(initialSearchNode);
     
         const visited = new Set<string>();
     
         while (!priorityQueue.isEmpty()) {
-            priorityQueue.elements.sort((a, b) => a.priority() - b.priority());
             const currentNode = priorityQueue.poll();
             if (!currentNode) {
                 throw new Error("Priority queue is empty unexpectedly.");
@@ -65,9 +72,6 @@ class Solver {
             }
         }
         return [];
-    }//ask aaron how to run this and debug
+    }    
 }
-
 export default Solver;
-
-

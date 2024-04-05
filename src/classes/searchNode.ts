@@ -14,13 +14,21 @@ class SearchNode {
     }
 
     priority(): number {
-        return this.moves;
+        return this.moves + this.board.manhattan();
     }
 
     getBoard() {
         return this.board
     }
 
+    hammingPriority(): number {
+        return this.moves + this.board.hamming();
+    }
+
+    // Calculate priority using the Manhattan priority function
+    manhattanPriority(): number {
+        return this.moves + this.board.manhattan();
+    }
 }
 
 // const heap = new MinHeap<SearchNode>([], {comparator: (a, b) => a.priority() - b.priority()});
