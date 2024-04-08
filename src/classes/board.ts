@@ -85,39 +85,37 @@ class Board {
     }
 
     // all neighboring boards
-    neighbors(): Board[] {
-        // Find the blank square's position
-        let blankRow = -1;
-        let blankCol = -1;
-        for (let i = 0; i < this.size; i++) {
-            for (let j = 0; j < this.size; j++) {
-                if (this.tiles[i][j] === 0) {
-                    blankRow = i;
-                    blankCol = j;
-                    break;
-                }
-            }
-            if (blankRow !== -1) break;
-        }
-        const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]; // Right, Down, Left, Up
-        let neighbors: Board[] = [];
-
-        for (let i = 0; i < directions.length; i++) {
-            for (let j = 0; j < directions.length; j++) {
-                let newRow = blankRow + directions[i][j];
-                let newCol = blankCol + directions[i][j];
-                if (newRow >= 0 && newRow < this.size && newCol >= 0 && newCol < this.size) {
-
-                    let newTiles = JSON.parse(JSON.stringify(this.tiles));
-                    [newTiles[blankRow][blankCol], newTiles[newRow][newCol]] =
-                        [newTiles[newRow][newCol], newTiles[blankRow][blankCol]];
-                    neighbors.push(new Board(newTiles));
-                }
+   // all neighboring boards
+neighbors(): Board[] {
+    let blankRow = -1;
+    let blankCol = -1;
+    for (let i = 0; i < this.size; i++) {
+        for (let j = 0; j < this.size; j++) {
+            if (this.tiles[i][j] === 0) {
+                blankRow = i;
+                blankCol = j;
+                break;
             }
         }
-
-        return neighbors;
+        if (blankRow !== -1) break;
     }
+    const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]; // Right, Down, Left, Up
+    let neighbors: Board[] = [];
+
+    for (const [dx, dy] of directions) {
+        const newRow = blankRow + dx;
+        const newCol = blankCol + dy;
+        if (newRow >= 0 && newRow < this.size && newCol >= 0 && newCol < this.size) {
+            let newTiles = JSON.parse(JSON.stringify(this.tiles));
+            [newTiles[blankRow][blankCol], newTiles[newRow][newCol]] =
+                [newTiles[newRow][newCol], newTiles[blankRow][blankCol]];
+            neighbors.push(new Board(newTiles));
+        }
+    }
+
+    return neighbors;
+}
+
 
     // a board that is obtained by exchanging any pair of tiles
     twin(): Board {
