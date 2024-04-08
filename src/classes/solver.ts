@@ -14,12 +14,24 @@ class Solver {
 
     // is the initial board solvable? (see below)
     isSolvable(): boolean {
-        // Calculate the sum of the Manhattan distances for the initial board
-        const manhattanDistanceSum = this.initial.manhattan();
-        
-        // If the sum of the Manhattan distances is even, the puzzle is solvable
-        // Otherwise, it's unsolvable
-        return manhattanDistanceSum % 2 === 0;
+        // Calculate the inversion count
+        let invCount = this.getInvCount();
+        // Return true if the inversion count is even
+        return (invCount % 2 === 0);
+    }
+
+    getInvCount(): number {
+        let invCount = 0;
+        for (let i = 0; i < this.initial.size; i++) {
+            for (let j = i + 1; j < this.initial.size; j++) {
+                for (let k = j + 1; k < this.initial.size; k++) {
+                    if (this.initial.tiles[i][j] > 0 && this.initial.tiles[i][j] > this.initial.tiles[i][k]) {
+                        invCount++;
+                    }
+                }
+            }
+        }
+        return invCount;
     }
 
     //implement isSolvable criteria, and moves method
@@ -33,6 +45,8 @@ class Solver {
             return -1;
         }
     }
+
+    
     
     // sequence of boards in a shortest solution; null if unsolvable
     solution(): Board[] {
