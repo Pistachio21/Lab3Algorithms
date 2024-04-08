@@ -52,24 +52,18 @@ class Board {
         let sum = 0;
         for (let i = 0; i < this.size; i++) {
             for (let j = 0; j < this.size; j++) {
-                const currentNumber = i * this.size + j + 1;
-                let goalRow = -1
-                let goalCol = -1;
-                for (let row = 0; row < this.size; row++) {
-                    const col = this.tiles[row].indexOf(currentNumber);
-                    if (col !== -1) {
-                        goalRow = row;
-                        goalCol = col;
-                        break;
-                    }
+                const currentNumber = this.tiles[i][j];
+                if (currentNumber !== 0) {
+                    const goalRow = Math.floor((currentNumber - 1) / this.size);
+                    const goalCol = (currentNumber - 1) % this.size;
+                    const distance = Math.abs(i - goalRow) + Math.abs(j - goalCol);
+                    sum += distance;
                 }
-                const distance = Math.abs(i - goalRow) + Math.abs(j - goalCol);
-                sum += distance;
             }
         }
-
         return sum;
     }
+    
 
 
     // is this board the goal board?
