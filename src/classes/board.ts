@@ -55,8 +55,6 @@ class Board {
         return sum;
     }
     
-
-
     // is this board the goal board?
     isGoal(): boolean {
         // PLS MODIFY
@@ -66,7 +64,7 @@ class Board {
     // does this board equal y?
     equals(y: Board): boolean {
         // PLS MODIFY
-        return this.manhattan() < y.manhattan()
+        return this.tiles === y.tiles
     }
 
     // all neighboring boards
@@ -83,7 +81,7 @@ class Board {
             }
             if (blankRow !== -1) break;
         }
-        const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]; // Right, Down, Left, Up
+        const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
         let neighbors: Board[] = [];
 
         for (const [dx, dy] of directions) {
@@ -103,23 +101,21 @@ class Board {
     // a board that is obtained by exchanging any pair of tiles
     twin(): Board {
         let newTiles = JSON.parse(JSON.stringify(this.tiles));
-        let collectionTiles: Placement[] = []
+        let collectionTiles: Placement[] = [];
         for (let i = 0; i < this.size; i++) {
             for (let j = 0; j < this.size - 1; j++) {
                 if (newTiles[i][j] !== 0 && newTiles[i][j + 1] !== 0) {
-                   collectionTiles.push({i, j})
+                    collectionTiles.push({i, j});
                 }
             }
         }
-        let position1 = collectionTiles[Math.floor(Math.random() * collectionTiles.length)]
-        let position2
+        let position1 = collectionTiles[Math.floor(Math.random() * collectionTiles.length)];
+        let filteredTiles = collectionTiles.filter(tile => tile.i !== 
+            position1.i || tile.j !== position1.j);
+        let position2 = filteredTiles[Math.floor(Math.random() * filteredTiles.length)];
 
-        do{
-            position2 = position1
-        } while (position2 === position1)
-
-        [newTiles[position1.i][position2.j], newTiles[position2.i][position2.j]] =
-            [newTiles[position1.i][position1.j], newTiles[position1.i][position1.j]];
+        [newTiles[position1.i][position1.j], newTiles[position2.i][position2.j]] =
+            [newTiles[position2.i][position2.j], newTiles[position1.i][position1.j]];
         return new Board(newTiles);
     }
 }
