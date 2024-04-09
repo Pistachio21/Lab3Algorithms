@@ -15,8 +15,6 @@ class Solver {
         this.initial = initial
         this.nodeToBoardMap = new Map<SearchNode, Board>();
     }
-
-    // is the initial board solvable? (see below)
     // is the initial board solvable? (see below)
     isSolvable(): boolean {
         const invCount = this.getInvCount(this.initial.tiles);
