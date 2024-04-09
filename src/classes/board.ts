@@ -1,3 +1,8 @@
+interface Placement {
+    i: number,
+    j: number
+}
+
 class Board {
     tiles: number[][]
     size: number
@@ -14,20 +19,6 @@ class Board {
         return this.tiles.map(row => row.join(' ')).join('\n');
     }
 
-    inversionCount() {
-        let count = 0;
-        for (let i = 0; i < this.size; i++) {
-            for (let j = 0; j < this.size; j++) {
-                for (let k = j + 1; k < this.size; k++) {
-                    if (this.tiles[i][j] !== 0 && this.tiles[i][k] !== 0 && this.tiles[i][j] > this.tiles[i][k]) {
-                        count++;
-                    }
-                }
-            }
-        }
-        return count;
-    }
-    
     // board dimension n
     dimension(): number {
         // PLS MODIFY
@@ -37,8 +28,8 @@ class Board {
     // number of tiles out of place
     hamming(): number {
         let count = 0;
-        for (let i = 0; i < this.size; i++) {
-            for (let j = 0; j < this.size; j++) {
+        for (let i = 0; i < this.dimension(); i++) {
+            for (let j = 0; j < this.dimension(); j++) {
                 if (this.tiles[i][j] !== i * this.size + j + 1 && this.tiles[i][j] !== 0) {
                     count++;
                 }
@@ -85,55 +76,56 @@ class Board {
     }
 
     // all neighboring boards
-   // all neighboring boards
-neighbors(): Board[] {
-    let blankRow = -1;
-    let blankCol = -1;
-    for (let i = 0; i < this.size; i++) {
-        for (let j = 0; j < this.size; j++) {
-            if (this.tiles[i][j] === 0) {
-                blankRow = i;
-                blankCol = j;
-                break;
+    neighbors(): Board[] {
+        let blankRow = -1;
+        let blankCol = -1;
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                if (this.tiles[i][j] === 0) {
+                    blankRow = i;
+                    blankCol = j;
+                    break;
+                }
+            }
+            if (blankRow !== -1) break;
+        }
+        const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]; // Right, Down, Left, Up
+        let neighbors: Board[] = [];
+
+        for (const [dx, dy] of directions) {
+            const newRow = blankRow + dx;
+            const newCol = blankCol + dy;
+            if (newRow >= 0 && newRow < this.size && newCol >= 0 && newCol < this.size) {
+                let newTiles = JSON.parse(JSON.stringify(this.tiles));
+                [newTiles[blankRow][blankCol], newTiles[newRow][newCol]] =
+                    [newTiles[newRow][newCol], newTiles[blankRow][blankCol]];
+                neighbors.push(new Board(newTiles));
             }
         }
-        if (blankRow !== -1) break;
+
+        return neighbors;
     }
-    const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]; // Right, Down, Left, Up
-    let neighbors: Board[] = [];
-
-    for (const [dx, dy] of directions) {
-        const newRow = blankRow + dx;
-        const newCol = blankCol + dy;
-        if (newRow >= 0 && newRow < this.size && newCol >= 0 && newCol < this.size) {
-            let newTiles = JSON.parse(JSON.stringify(this.tiles));
-            [newTiles[blankRow][blankCol], newTiles[newRow][newCol]] =
-                [newTiles[newRow][newCol], newTiles[blankRow][blankCol]];
-            neighbors.push(new Board(newTiles));
-        }
-    }
-
-    return neighbors;
-}
-
 
     // a board that is obtained by exchanging any pair of tiles
     twin(): Board {
         let newTiles = JSON.parse(JSON.stringify(this.tiles));
-        let position1 = -1;
-        let position2 = -1;
+        let collectionTiles: Placement[] = []
         for (let i = 0; i < this.size; i++) {
             for (let j = 0; j < this.size - 1; j++) {
                 if (newTiles[i][j] !== 0 && newTiles[i][j + 1] !== 0) {
-                    position1 = i;
-                    position2 = j;
-                    break;
+                   collectionTiles.push({i, j})
                 }
             }
-            if (position1 !== -1) break;
         }
-        [newTiles[position1][position2], newTiles[position1][position2 + 1]] =
-            [newTiles[position1][position2 + 1], newTiles[position1][position2]];
+        let position1 = collectionTiles[Math.floor(Math.random() * collectionTiles.length)]
+        let position2
+
+        do{
+            position2 = position1
+        } while (position2 === position1)
+
+        [newTiles[position1.i][position2.j], newTiles[position2.i][position2.j]] =
+            [newTiles[position1.i][position1.j], newTiles[position1.i][position1.j]];
         return new Board(newTiles);
     }
 }

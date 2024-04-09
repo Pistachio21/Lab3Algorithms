@@ -37,8 +37,11 @@ if (!solver.isSolvable()) {
     console.log("No solution possible");
 } else {
     console.log("Minimum number of moves = " + solver.moves());
-    for (let board of solver.solution()) {
-        console.log(board.toStrings());
-        console.log("---------")
+    let solution = solver.solution()
+    if (solution) {
+        for (let board of solution) {
+            console.log(board.toStrings());
+            console.log("---------")
+        }
     }
 }

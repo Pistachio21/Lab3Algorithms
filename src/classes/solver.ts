@@ -5,8 +5,12 @@ import { MinHeap } from "min-heap-typed";
 class Solver {
     initial: Board
     nodeToBoardMap: Map<SearchNode, Board>;
+
     // find a solution to the initial board (using the A* algorithm)
     constructor(initial: Board) {
+        if (initial === null) {
+            throw new Error('Board cannot be null.')
+        }
         // YOUR CODE HERE
         this.initial = initial
         this.nodeToBoardMap = new Map<SearchNode, Board>();
@@ -14,9 +18,7 @@ class Solver {
 
     // is the initial board solvable? (see below)
     isSolvable(): boolean {
-        // Calculate the inversion count
         let invCount = this.getInvCount();
-        // Return true if the inversion count is even
         return (invCount % 2 === 0);
     }
 
@@ -34,37 +36,34 @@ class Solver {
         return invCount;
     }
 
-    //implement isSolvable criteria, and moves method
-
     // min number of moves to solve initial board; -1 if unsolvable
     moves(): number {
         const solution = this.solution();
-        if (solution.length > 0) {
-            return solution.length - 1;
+        if (solution && solution.length > 0) {
+            return solution.length;
         } else {
             return -1;
         }
     }
 
-    
-    
     // sequence of boards in a shortest solution; null if unsolvable
-    solution(): Board[] {
+    solution(): Board[] | null {
         const priorityQueue = new MinHeap<SearchNode>([], {
-            comparator: (a, b) => 
-            a.manhattanPriority() - b.manhattanPriority()});
+            comparator: (a, b) =>
+                a.manhattanPriority() - b.manhattanPriority()
+        });
         const initialSearchNode = new SearchNode(0, null, this.initial);
         priorityQueue.add(initialSearchNode);
-    
+
         const visited = new Set<string>();
-    
+
         while (!priorityQueue.isEmpty()) {
             const currentNode = priorityQueue.poll();
             if (!currentNode) {
                 throw new Error("Priority queue is empty unexpectedly.");
             }
             const currentBoard = currentNode.getBoard();
-    
+
             if (currentBoard.isGoal()) {
                 const solutionPath: Board[] = [];
                 let node: SearchNode | null = currentNode;
@@ -74,9 +73,9 @@ class Solver {
                 }
                 return solutionPath;
             }
-    
+
             visited.add(currentBoard.toStrings());
-    
+
             const neighbors = currentBoard.neighbors();
             for (const neighbor of neighbors) {
                 const neighborNode = new SearchNode(currentNode.moves + 1, currentNode, neighbor);
@@ -85,7 +84,7 @@ class Solver {
                 }
             }
         }
-        return [];
-    }    
+        return null;
+    }
 }
 export default Solver;
