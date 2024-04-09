@@ -17,38 +17,30 @@ class Solver {
     }
     // is the initial board solvable? (see below)
     isSolvable(): boolean {
-        const invCount = this.getInvCount(this.initial.tiles);
-        return invCount % 2 === 0;
+        const invCount = this.getInvCount();
+        const blankRow = this.initial.tiles.findIndex(row => row.includes(0));
+        const gridSize = Math.sqrt(this.initial.tiles.length);
+        const isEvenGrid = gridSize % 2 === 0;
+        
+        if (isEvenGrid) {
+            const correctedInvCount = invCount + blankRow;
+            return correctedInvCount % 2 === 0;
+        } else {
+            return invCount % 2 === 0;
+        }
     }
-    private getInvCount(tiles: number[][]): number {
+    
+    getInvCount(): number {
         let invCount = 0;
-        const size = tiles.length;
-    
-        // Count inversions in each row
-        for (let i = 0; i < size; i++) {
-            for (let j = 0; j < size - 1; j++) {
-                // Treat the blank tile as having a higher number than any other tile
-                const tile1 = tiles[i][j] === 0 ? size * size : tiles[i][j];
-                const tile2 = tiles[i][j + 1] === 0 ? size * size : tiles[i][j + 1];
-                if (tile1 > tile2) {
-                    invCount++;
+        for (let i = 0; i < this.initial.size; i++) {
+            for (let j = i + 1; j < this.initial.size; j++) {
+                for (let k = j + 1; k < this.initial.size; k++) {
+                    if (this.initial.tiles[i][j] > 0 && this.initial.tiles[i][j] > this.initial.tiles[i][k]) {
+                        invCount++;
+                    }
                 }
             }
         }
-    
-        // Count inversions in each column
-        for (let j = 0; j < size; j++) {
-            for (let i = 0; i < size - 1; i++) {
-                // Treat the blank tile as having a higher number than any other tile
-                const tile1 = tiles[i][j] === 0 ? size * size : tiles[i][j];
-                const tile2 = tiles[i + 1][j] === 0 ? size * size : tiles[i + 1][j];
-                if (tile1 > tile2) {
-                    invCount++;
-                }
-            }
-        }
-    
-        console.log("Inversion Count:", invCount);
         return invCount;
     }
     
