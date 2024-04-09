@@ -17,25 +17,43 @@ class Solver {
     }
 
     // is the initial board solvable? (see below)
+    // is the initial board solvable? (see below)
     isSolvable(): boolean {
-        let invCount = this.getInvCount();
-        return (invCount % 2 === 0);
+        const invCount = this.getInvCount(this.initial.tiles);
+        return invCount % 2 === 0;
     }
-
-    getInvCount(): number {
+    private getInvCount(tiles: number[][]): number {
         let invCount = 0;
-        for (let i = 0; i < this.initial.size; i++) {
-            for (let j = i + 1; j < this.initial.size; j++) {
-                for (let k = j + 1; k < this.initial.size; k++) {
-                    if (this.initial.tiles[i][j] > 0 && this.initial.tiles[i][j] > this.initial.tiles[i][k]) {
-                        invCount++;
-                    }
+        const size = tiles.length;
+    
+        // Count inversions in each row
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size - 1; j++) {
+                // Treat the blank tile as having a higher number than any other tile
+                const tile1 = tiles[i][j] === 0 ? size * size : tiles[i][j];
+                const tile2 = tiles[i][j + 1] === 0 ? size * size : tiles[i][j + 1];
+                if (tile1 > tile2) {
+                    invCount++;
                 }
             }
         }
+    
+        // Count inversions in each column
+        for (let j = 0; j < size; j++) {
+            for (let i = 0; i < size - 1; i++) {
+                // Treat the blank tile as having a higher number than any other tile
+                const tile1 = tiles[i][j] === 0 ? size * size : tiles[i][j];
+                const tile2 = tiles[i + 1][j] === 0 ? size * size : tiles[i + 1][j];
+                if (tile1 > tile2) {
+                    invCount++;
+                }
+            }
+        }
+    
+        console.log("Inversion Count:", invCount);
         return invCount;
     }
-
+    
     // min number of moves to solve initial board; -1 if unsolvable
     moves(): number {
         const solution = this.solution();
@@ -50,7 +68,15 @@ class Solver {
     solution(): Board[] | null {
         const priorityQueue = new MinHeap<SearchNode>([], {
             comparator: (a, b) =>
-                a.manhattanPriority() - b.manhattanPriority()
+               {
+                if (a.moves !== b.moves) {
+                    return a.moves - b.moves;
+                  } else if (a.hammingPriority() !== b.hammingPriority()) {
+                    return a.hammingPriority() - b.hammingPriority();
+                  } else {
+                    return a.manhattanPriority() - b.manhattanPriority();
+                  }
+               }
         });
         const initialSearchNode = new SearchNode(0, null, this.initial);
         priorityQueue.add(initialSearchNode);
