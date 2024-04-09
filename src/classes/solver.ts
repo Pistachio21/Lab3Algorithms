@@ -21,14 +21,17 @@ class Solver {
         const blankRow = this.initial.tiles.findIndex(row => row.includes(0));
         const gridSize = Math.sqrt(this.initial.tiles.length);
         const isEvenGrid = gridSize % 2 === 0;
-        
-        if (isEvenGrid) {
-            const correctedInvCount = invCount + blankRow;
-            return correctedInvCount % 2 === 0;
+    
+        if (isEvenGrid && this.moves() >= 0) {
+            const correctedInvCount = invCount + (gridSize - 1 - blankRow);
+            return (correctedInvCount % 2 === 0);
+        } else if (!isEvenGrid && this.moves() >= 0) {
+            return (invCount % 2 === 0);
         } else {
-            return invCount % 2 === 0;
+            return false;
         }
     }
+    
     
     getInvCount(): number {
         let invCount = 0;
